@@ -78,8 +78,9 @@ This approach gives the method its name: **Group Relative Policy Optimization (G
 
 KL divergence is estimated using the approximator introduced by [Schulman et al. (2020)](http://joschu.net/blog/kl-approx.html). The approximator is defined as follows:
 
-\[D_{\text{KL}}\left[\pi_\theta \|\pi_{\text{ref}}\right] = \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - \log \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - 1
-\]
+D_KL[π_θ || π_ref] = (π_ref(o_i,t | q, o_i,<t) / π_θ(o_i,t | q, o_i,<t)) 
+                     - log(π_ref(o_i,t | q, o_i,<t) / π_θ(o_i,t | q, o_i,<t)) - 1
+
 
 
 ### Computing the loss

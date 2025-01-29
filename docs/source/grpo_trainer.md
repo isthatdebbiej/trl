@@ -64,11 +64,11 @@ GRPO is an online learning algorithm, meaning it improves iteratively by using t
 
 ### Generating completions
 
-At each training step, we sample a batch of prompts and generate a set of  \\( G \\) completions for each prompt (denoted as  \\( o_i \\)).
+At each training step, we sample a batch of prompts and generate a set of  \( G \) completions for each prompt (denoted as  \( o_i \)).
 
 ### Computing the advantage
 
-For each of the  \\( G \\) sequences, we compute the reward using a reward model. To align with the comparative nature of reward models—typically trained on datasets of comparisons between outputs for the same question—the advantage is calculated to reflect these relative comparisons. It is normalized as follows:  
+For each of the  \( G \) sequences, we compute the reward using a reward model. To align with the comparative nature of reward models—typically trained on datasets of comparisons between outputs for the same question—the advantage is calculated to reflect these relative comparisons. It is normalized as follows:  
 
 $$\hat{A}_{i,t} = \frac{r_i - \text{mean}(\mathbf{r})}{\text{std}(\mathbf{r})}$$  
 
@@ -78,7 +78,9 @@ This approach gives the method its name: **Group Relative Policy Optimization (G
 
 KL divergence is estimated using the approximator introduced by [Schulman et al. (2020)](http://joschu.net/blog/kl-approx.html). The approximator is defined as follows:
 
-![Equation](https://render.githubusercontent.com/render/math?math=D_{\text{KL}}\left[\pi_\theta \|\pi_{\text{ref}}\right] = \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - \log \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - 1)
+$$
+D_{\text{KL}}\left[\pi_\theta \|\pi_{\text{ref}}\right] = \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - \log \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,<t})}{\pi_\theta(o_{i,t} \mid q, o_{i,<t})} - 1
+$$
 
 
 
@@ -96,11 +98,12 @@ where the first term represents the scaled advantage and the second term penaliz
 In the original paper, this formulation is generalized to account for multiple updates after each generation by leveraging the **clipped surrogate objective**:  
 
 $$
-\mathcal{L}_{\text{GRPO}}(\theta) = - \frac{1}{G} \sum_{i=1}^G \frac{1}{|o_i|} \sum_{t=1}^{|o_i|} \left[ \min \left( \frac{\pi_\theta(o_{i,t} \mid q, o_{i,< t})}{\pi_{\theta_{\text{old}}}(o_{i,t} \mid q, o_{i,< t})} \hat{A}_{i,t}, \, \text{clip}\left( \frac{\pi_\theta(o_{i,t} \mid q, o_{i,< t})}{\pi_{\theta_{\text{old}}}(o_{i,t} \mid q, o_{i,< t})}, 1 - \epsilon, 1 + \epsilon \right) \hat{A}_{i,t} \right) - \beta \mathbb{D}_{\text{KL}}\left[\pi_\theta \| \pi_{\text{ref}}\right] \right],
+\mathcal{L}_{\text{GRPO}}(\theta) = - \frac{1}{G} \sum_{i=1}^G \frac{1}{|o_i|} \sum_{t=1}^{|o_i|} \left[ \min \left( \frac{\pi_\theta(o_{i,t} \mid q, o_{i,< t})}{\pi_{\theta_{\text{old}}}(o_{i,t} \mid q, o_{i,< t})} \hat{A}_{i,t}, \text{clip}\left( \frac{\pi_\theta(o_{i,t} \mid q, o_{i,< t})}{\pi_{\theta_{\text{old}}}(o_{i,t} \mid q, o_{i,< t})}, 1 - \epsilon, 1 + \epsilon \right) \hat{A}_{i,t} \right) - \beta \mathbb{D}_{\text{KL}}\left[\pi_\theta \| \pi_{\text{ref}}\right] \right],
 $$
 
-where  \\(\text{clip}(\cdot, 1 - \epsilon, 1 + \epsilon) \\) ensures that updates do not deviate excessively from the reference policy by bounding the policy ratio between  \\( 1 - \epsilon \\) and  \\( 1 + \epsilon \\).
-In TRL though, as in the original paper, we only do one update per generation, so we can simplify the loss to the first form.
+
+where  \(\text{clip}(\cdot, 1 - \epsilon, 1 + \epsilon) \) ensures that updates do not deviate excessively from the reference policy by bounding the policy ratio between  \( 1 - \epsilon \\) and  \\( 1 + \epsilon \).
+In TRL though, as in the original paper, we only do one update per generation to simplify the loss to the first form.
 
 ## Logged metrics
 
@@ -109,8 +112,8 @@ The GRPO Trainer logs the following metrics:
 - `completion_length`: The average completion length.
 - `reward/{reward_func_name}`: The reward computed by each reward function.
 - `reward`: The average reward.
-- `reward_std` : The average standard deviation within reward groups.
-- `kl` : The average KL divergence between the model and the reference model calculated on completions.
+- `reward_std`: The average standard deviation within reward groups.
+- `kl`: The average KL divergence between the model and the reference model calculated on completions.
 
 ## Customization
 
